@@ -8,11 +8,29 @@ permissions:
   packages: read
 
 jobs:
+  pre-auth:
+    runs-on: ubuntu-latest
+    outputs:
+      docker_auth_token: ${{ steps.auth.outputs.docker_auth_token }}
+
+    steps:
+      - name: Authenticate to Container Registry
+        id: auth
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
   test:
+    needs: pre-auth
     name: Test the Action
     runs-on: ubuntu-latest
 
     steps:
+      - name: Set up Docker auth token
+        run: echo "${{ needs.pre-auth.outputs.docker_auth_token }}" | docker login ghcr.io --username ${{ github.actor }} --password-stdin
+
       - name: Run the Container Action
         id: run
         uses: sergei-tol/test-gh-action@v0.1.1
