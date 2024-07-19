@@ -28,9 +28,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Set up Docker auth token
-        run: echo "${{ needs.pre-auth.outputs.docker_auth_token }}" | docker login ghcr.io --username ${{ github.actor }} --password-stdin
-
       - name: Run the Container Action
         id: run
         uses: sergei-tol/test-gh-action@v0.1.1
